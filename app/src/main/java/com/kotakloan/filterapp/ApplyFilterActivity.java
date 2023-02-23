@@ -3,7 +3,9 @@ package com.kotakloan.filterapp;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
@@ -16,6 +18,7 @@ import android.os.Build;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -33,6 +36,7 @@ public class ApplyFilterActivity extends AppCompatActivity {
     }
 
     private void initView() {
+        setToolbar(ApplyFilterActivity.this,"Result Screen");
         imgShowFilter = findViewById(R.id.imgShowFilter);
         byte[] byteArray = getIntent().getByteArrayExtra("image");
          bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
@@ -74,21 +78,7 @@ public class ApplyFilterActivity extends AppCompatActivity {
             ex.printStackTrace();
         }
     }
-    private Bitmap addWaterMark(Bitmap src) {
-        int w = src.getWidth();
-        int h = src.getHeight();
-        Bitmap result = Bitmap.createBitmap(w, h, src.getConfig());
-        Canvas canvas = new Canvas(result);
-        canvas.drawBitmap(src, 0, 0, null);
 
-        Bitmap waterMark = BitmapFactory.decodeResource(getResources(), R.drawable.logo);
-        //  canvas.drawBitmap(waterMark, 0, 0, null);
-        int startX= (canvas.getWidth()-waterMark.getWidth())/2;//for horisontal position
-        int startY=(canvas.getHeight()-waterMark.getHeight())/2;//for vertical position
-        canvas.drawBitmap(waterMark,startX,startY,null);
-
-        return result;
-    }
     @RequiresApi(api = Build.VERSION_CODES.N)
     public void getCartoon(){
         ArrayList<ArrayList<Float>> im_array = new ArrayList<>();
@@ -174,5 +164,19 @@ public class ApplyFilterActivity extends AppCompatActivity {
             e.printStackTrace();
         }
         return drawnBitmap;
+    }
+    public static void setToolbar(Activity activity, String title) {
+        TextView txtToolTitle = activity.findViewById(R.id.txtToolTitle);
+        txtToolTitle.setText(title);
+        ImageView imgHome = activity.findViewById(R.id.imgHome);
+        imgHome.setVisibility(View.VISIBLE);
+        imgHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, FilterScreenActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                activity.startActivity(intent);
+            }
+        });
     }
 }

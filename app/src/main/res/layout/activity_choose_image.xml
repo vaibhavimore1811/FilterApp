@@ -5,13 +5,20 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
+    android:background="@drawable/gradient_background"
     tools:context=".ChooseImageActivity">
+    <include
+        android:id="@+id/customToolbar"
+        layout="@layout/custom_toolbar"
+        android:layout_alignParentTop="true"
+        android:layout_width="match_parent"
+        android:layout_height="50dp" />
     <TextView
         android:id="@+id/txtFilterName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="----"
-        android:layout_alignParentTop="true"
+        android:layout_below="@id/customToolbar"
         android:layout_centerHorizontal="true"
         android:layout_marginTop="30dp"
         android:textColor="@color/white"
@@ -23,7 +30,7 @@
         android:layout_below="@id/txtFilterName"
         android:layout_gravity="center"
         android:layout_centerHorizontal="true"
-        android:layout_marginTop="120dp"
+        android:layout_marginTop="60dp"
         android:layout_height="250dp"
         android:src="@drawable/background"/>
 

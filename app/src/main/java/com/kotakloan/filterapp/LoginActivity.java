@@ -9,6 +9,7 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Patterns;
 import android.view.View;
+import android.widget.Toast;
 
 import com.google.android.material.textfield.TextInputEditText;
 
@@ -29,8 +30,8 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
 
 
     private void initView() {
-        etdUserName = findViewById(R.id.etdUserName);
-        etdPassword = findViewById(R.id.etdPassword);
+        etdUserName = findViewById(R.id.edtUserName);
+        etdPassword = findViewById(R.id.edtPassword);
         btnLogin = findViewById(R.id.btnLogin);
         btnLogin.setOnClickListener(this);
 
@@ -43,7 +44,14 @@ public class LoginActivity extends AppCompatActivity implements View.OnClickList
         {
             case R.id.btnLogin:
                     if(isUserValidate()){
-                        SignInMethod();
+                        if(SignInEmail.equalsIgnoreCase("admin@gmail.com") && SignInPassword.equalsIgnoreCase("Admin@123"))
+                        {
+                            SignInMethod();
+
+                        }else {
+                            Toast.makeText(this, "Enter right credentials ", Toast.LENGTH_SHORT).show();
+                        }
+
                     }
 
                 break;

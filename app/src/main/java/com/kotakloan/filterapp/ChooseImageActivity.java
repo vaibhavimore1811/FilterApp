@@ -8,6 +8,7 @@ import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
 
 import android.Manifest;
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -42,6 +43,7 @@ ImageButton btnNext;
     }
 
     private void initView() {
+        setToolbar(ChooseImageActivity.this,"Select Image");
         SharedPreferences sharedPreferences = getSharedPreferences("FilterApp", Context.MODE_PRIVATE);
         filterType = sharedPreferences.getString("filterType", "");
         txtFilterName = findViewById(R.id.txtFilterName);
@@ -215,5 +217,19 @@ ImageButton btnNext;
         Intent in1 = new Intent(this, ApplyFilterActivity.class);
         in1.putExtra("image",byteArray);
         startActivity(in1);
+    }
+    public static void setToolbar(Activity activity, String title) {
+        TextView txtToolTitle = activity.findViewById(R.id.txtToolTitle);
+        txtToolTitle.setText(title);
+        ImageView imgHome = activity.findViewById(R.id.imgHome);
+        imgHome.setVisibility(View.VISIBLE);
+        imgHome.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view) {
+                Intent intent = new Intent(activity, FilterScreenActivity.class);
+                intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                activity.startActivity(intent);
+            }
+        });
     }
 }
