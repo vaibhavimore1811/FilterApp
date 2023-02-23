@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".ChooseImageActivity">
+    <TextView
+        android:id="@+id/txtFilterName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="----"
+        android:layout_alignParentTop="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="30dp"
+        android:textColor="@color/white"
+        android:textSize="45sp"
+         />
+    <ImageView
+        android:id="@+id/imgDisplay"
+        android:layout_width="350dp"
+        android:layout_below="@id/txtFilterName"
+        android:layout_gravity="center"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="120dp"
+        android:layout_height="250dp"
+        android:src="@drawable/background"/>
+
+    <androidx.appcompat.widget.AppCompatButton
+        android:id="@+id/btnChooseImg"
+        android:layout_width="271dp"
+        android:layout_height="55dp"
+        android:layout_marginTop="50dp"
+        android:text="choose photo"
+        android:background="@drawable/button_background"
+        android:layout_gravity="center"
+        android:textAlignment="center"
+        android:textColor="#FFFFFF"
+        android:layout_centerHorizontal="true"
+        android:layout_above="@id/btnNext"
+        android:textSize="16sp"
+        android:textStyle="bold"
+       />
+    <ImageButton
+        android:id="@+id/btnNext"
+        android:layout_width="80dp"
+        android:layout_alignParentBottom="true"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="20dp"
+        android:src="@drawable/ic_baseline_arrow_forward_24"
+        android:layout_height="80dp"
+        android:background="@drawable/round_background"
+        android:layout_gravity="center"
+        android:layout_marginTop="50dp"/>
+
+</RelativeLayout>
