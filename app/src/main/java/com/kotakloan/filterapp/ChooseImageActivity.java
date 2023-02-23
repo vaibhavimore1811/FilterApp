@@ -223,16 +223,15 @@ public class ChooseImageActivity extends AppCompatActivity implements View.OnCli
     }
 
     public void NextActivity() {
-
         bitMapString = BitMapToString(selectedImageBitmap);
         SharedPreferences sharedPreferences = getSharedPreferences("FilterApp", MODE_PRIVATE);
         SharedPreferences.Editor editor = sharedPreferences.edit();
         editor.putString("img", bitMapString);
         editor.commit();
-        progressDialog.cancel();
         Intent in1 = new Intent(this, ApplyFilterActivity.class);
         startActivity(in1);
         ProgressBar.setVisibility(View.GONE);
+        progressDialog.cancel();
     }
 
     public static void setToolbar(Activity activity, String title) {
