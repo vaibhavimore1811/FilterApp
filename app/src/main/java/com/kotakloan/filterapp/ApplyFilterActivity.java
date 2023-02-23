@@ -16,34 +16,41 @@ import android.graphics.ColorMatrixColorFilter;
 import android.graphics.Paint;
 import android.os.Build;
 import android.os.Bundle;
+import android.util.Base64;
 import android.view.View;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.util.ArrayList;
 
 public class ApplyFilterActivity extends AppCompatActivity {
-    Bitmap bitmap,resultBitmap,resultBitmapWithWatermark;
+    Bitmap bitmap,resultBitmap;
     String filterType;
     ImageView imgShowFilter;
+    ProgressBar ProgressBar;
     ImageFilters imgFilter;
-    public int height=128, width = 128;
+    public int height=500, width = 500;
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_apply_filter);
-        initView();
+
     }
 
     private void initView() {
         setToolbar(ApplyFilterActivity.this,"Result Screen");
-        imgShowFilter = findViewById(R.id.imgShowFilter);
-        byte[] byteArray = getIntent().getByteArrayExtra("image");
-         bitmap = BitmapFactory.decodeByteArray(byteArray, 0, byteArray.length);
         SharedPreferences sharedPreferences = getSharedPreferences("FilterApp", Context.MODE_PRIVATE);
+        imgShowFilter = findViewById(R.id.imgShowFilter);
+        ProgressBar = findViewById(R.id.ProgressBar);
+        String bitmapString = sharedPreferences.getString("img", "");
+       bitmap = StringToBitMap(bitmapString);
+       //  bitmap = (Bitmap) getIntent().getParcelableExtra("Image");
+
         filterType = sharedPreferences.getString("filterType", "");
         imgFilter = new ImageFilters();
-        setFilterName(filterType);
+
 
 
     }
@@ -72,6 +79,7 @@ public class ApplyFilterActivity extends AppCompatActivity {
         try {
             resultBitmap = bmp;
             imgShowFilter.setImageBitmap(bmp);
+            ProgressBar.setVisibility(View.GONE);
 
         }
         catch(Exception ex){
@@ -148,6 +156,7 @@ public class ApplyFilterActivity extends AppCompatActivity {
         Bitmap newBitmap = getCombinedBitmap(bitmap, bmp);
         resultBitmap = newBitmap;
         imgShowFilter.setImageBitmap(newBitmap);
+        ProgressBar.setVisibility(View.GONE);
     }
     public Bitmap getCombinedBitmap(Bitmap b, Bitmap b2) {
         Bitmap drawnBitmap = null;
@@ -178,5 +187,26 @@ public class ApplyFilterActivity extends AppCompatActivity {
                 activity.startActivity(intent);
             }
         });
+    }
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        initView();
+    }
+    @Override
+    public void onAttachedToWindow() {
+        super.onAttachedToWindow();
+        setFilterName(filterType);
+    }
+    public Bitmap StringToBitMap(String encodedString){
+        try {
+            byte [] encodeByte= Base64.decode(encodedString,Base64.DEFAULT);
+            Bitmap bitmap=BitmapFactory.decodeByteArray(encodeByte, 0, encodeByte.length);
+            return bitmap;
+        } catch(Exception e) {
+            e.getMessage();
+            return null;
+        }
     }
 }

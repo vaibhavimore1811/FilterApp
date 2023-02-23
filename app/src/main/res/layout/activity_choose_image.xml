@@ -24,6 +24,13 @@
         android:textColor="@color/white"
         android:textSize="45sp"
          />
+    <ProgressBar
+        android:id="@+id/ProgressBar"
+        android:layout_width="150dp"
+        android:layout_height="150dp"
+        android:visibility="gone"
+        android:layout_centerInParent="true"
+        />
     <ImageView
         android:id="@+id/imgDisplay"
         android:layout_width="350dp"

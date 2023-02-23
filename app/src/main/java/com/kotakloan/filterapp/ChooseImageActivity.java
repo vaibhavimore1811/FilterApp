@@ -9,6 +9,7 @@ import androidx.core.content.ContextCompat;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -18,10 +19,12 @@ import android.graphics.Bitmap;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
+import android.util.Base64;
 import android.util.Log;
 import android.view.View;
 import android.widget.ImageButton;
 import android.widget.ImageView;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -29,12 +32,17 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 
 public class ChooseImageActivity extends AppCompatActivity implements View.OnClickListener {
-String filterType;
-TextView  txtFilterName;
-ImageView imgDisplay;
-AppCompatButton btnChooseImg;
-ImageButton btnNext;
+    String filterType;
+    TextView txtFilterName;
+    ImageView imgDisplay;
+    ProgressBar ProgressBar;
+    AppCompatButton btnChooseImg;
+    ImageButton btnNext;
+    ProgressDialog progressDialog;
+    String bitMapString;
+    Bitmap scaled;
     Bitmap selectedImageBitmap = null;
+
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -43,22 +51,27 @@ ImageButton btnNext;
     }
 
     private void initView() {
-        setToolbar(ChooseImageActivity.this,"Select Image");
+        setToolbar(ChooseImageActivity.this, "Select Image");
+        progressDialog = new ProgressDialog(ChooseImageActivity.this);
+        progressDialog.setTitle("Please Wait");
+        progressDialog.setMessage("Loading this Content, please wait!");
+
         SharedPreferences sharedPreferences = getSharedPreferences("FilterApp", Context.MODE_PRIVATE);
         filterType = sharedPreferences.getString("filterType", "");
         txtFilterName = findViewById(R.id.txtFilterName);
         imgDisplay = findViewById(R.id.imgDisplay);
+        ProgressBar = findViewById(R.id.ProgressBar);
         btnChooseImg = findViewById(R.id.btnChooseImg);
         btnNext = findViewById(R.id.btnNext);
         setFilterName(filterType);
+
         btnChooseImg.setOnClickListener(this);
         btnNext.setOnClickListener(this);
 
     }
 
     private void setFilterName(String filterType) {
-        switch (filterType)
-        {
+        switch (filterType) {
             case "BlackWhite":
                 String text = "Black &amp; white";
                 txtFilterName.setText(text);
@@ -89,17 +102,15 @@ ImageButton btnNext;
 
     @Override
     public void onClick(View view) {
-        switch (view.getId())
-        {
+        switch (view.getId()) {
             case R.id.btnChooseImg:
                 CheckPermission();
                 break;
             case R.id.btnNext:
-                if(selectedImageBitmap == null)
-                {
+                if (selectedImageBitmap == null) {
                     Toast.makeText(this, "Select Image", Toast.LENGTH_SHORT).show();
-                }else
-                {
+                } else {
+                    progressDialog.show();
                     NextActivity();
                 }
                 break;
@@ -109,11 +120,11 @@ ImageButton btnNext;
 
     private void CheckPermission() {
         if (ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.CAMERA) == PackageManager.PERMISSION_DENIED ||
-                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED||
-                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED)
-        {
-            ActivityCompat.requestPermissions(this, new String[] {Manifest.permission.CAMERA,Manifest.permission.WRITE_EXTERNAL_STORAGE,Manifest.permission.READ_EXTERNAL_STORAGE}, 5);
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.READ_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED ||
+                ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA, Manifest.permission.WRITE_EXTERNAL_STORAGE, Manifest.permission.READ_EXTERNAL_STORAGE}, 5);
         } else {
+            //  ProgressBar.setVisibility(View.VISIBLE);
             selectImage(ChooseImageActivity.this);
         }
     }
@@ -141,21 +152,21 @@ ImageButton btnNext;
         });
         builder.show();
     }
+
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == 5) {
             if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 selectImage(ChooseImageActivity.this);
-            }
-            else
-            {
+            } else {
                 CheckPermission();
             }
 
 
         }
     }
+
     @Override
     public void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
@@ -166,6 +177,7 @@ ImageButton btnNext;
                         selectedImageBitmap = (Bitmap) data.getExtras().get("data");
                         try {
                             imgDisplay.setImageBitmap(selectedImageBitmap);
+
                         } catch (Exception e) {
                             Log.e("imageException", e.toString());
                         }
@@ -176,10 +188,11 @@ ImageButton btnNext;
                 case 1:
                     if (resultCode == RESULT_OK && data != null) {
                         Uri selectedImage = data.getData();
-                         selectedImageBitmap = null;
+                        selectedImageBitmap = null;
                         try {
                             selectedImageBitmap = MediaStore.Images.Media.getBitmap(this.getContentResolver(), selectedImage);
                             imgDisplay.setImageBitmap(selectedImageBitmap);
+
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
@@ -208,16 +221,20 @@ ImageButton btnNext;
             }
         }
     }
-    public void NextActivity()
-    {
-        ByteArrayOutputStream stream = new ByteArrayOutputStream();
-        selectedImageBitmap.compress(Bitmap.CompressFormat.PNG, 100, stream);
-        byte[] byteArray = stream.toByteArray();
 
+    public void NextActivity() {
+
+        bitMapString = BitMapToString(selectedImageBitmap);
+        SharedPreferences sharedPreferences = getSharedPreferences("FilterApp", MODE_PRIVATE);
+        SharedPreferences.Editor editor = sharedPreferences.edit();
+        editor.putString("img", bitMapString);
+        editor.commit();
+        progressDialog.cancel();
         Intent in1 = new Intent(this, ApplyFilterActivity.class);
-        in1.putExtra("image",byteArray);
         startActivity(in1);
+        ProgressBar.setVisibility(View.GONE);
     }
+
     public static void setToolbar(Activity activity, String title) {
         TextView txtToolTitle = activity.findViewById(R.id.txtToolTitle);
         txtToolTitle.setText(title);
@@ -232,4 +249,13 @@ ImageButton btnNext;
             }
         });
     }
+
+    public String BitMapToString(Bitmap bitmap) {
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, baos);
+        byte[] b = baos.toByteArray();
+        String temp = Base64.encodeToString(b, Base64.DEFAULT);
+        return temp;
+    }
+
 }
